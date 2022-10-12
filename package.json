@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "connect": "remixd"
+    "connect": "remixd -s ."
   },
   "author": "",
   "license": "ISC",
