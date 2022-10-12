@@ -12,8 +12,10 @@ If you use VS Code, install the Solidity extension.
 
 ### ERC165Example
 3. Deploy the A contract first
-4. Deploy the B contract then, by adding the A address previously deployed (click "copy" on the deployed A instance)
+4. Deploy the B contract then, adding the A address previously deployed (click "copy" on the deployed A instance)
 5. Call the `checkIfASupportsInterface` function with these values:
     - 0x00000000 - wrong value
     - 0x01ffc9a7 - `supportInterface` selector, correct value
-    - 0xb599dd85 - `getLetter` selector, correct value
+    - 0x35e23170 - `Letter` selector (XOR of `getLetter` and `setLetter`), correct value
+
+Contract A extends contact ERC165, which has only one function, and provides 2 functions (a getter and a setter); the result of "supportInterface" is calculated as the quality of the parameter and the selector for "supportInterface" or the XOR of getters and setters provided by the contract.
