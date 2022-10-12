@@ -19,3 +19,5 @@ If you use VS Code, install the Solidity extension.
     - 0x35e23170 - `Letter` selector (XOR of `getLetter` and `setLetter`), correct value
 
 Contract A extends contact ERC165, which has only one function, and provides 2 functions (a getter and a setter); the result of "supportInterface" is calculated as the quality of the parameter and the selector for "supportInterface" or the XOR of getters and setters provided by the contract.
+
+Reference: https://eips.ethereum.org/EIPS/eip-165
