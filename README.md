@@ -3,7 +3,8 @@
 ## Getting started
 If you use VS Code, install the Solidity extension.
 1. Run `npm i`
-2. Run `npm run connect` to connect to Remix IDE
+2. Open the Remix IDE at https://remix.ethereum.org/
+3. Run `npm run connect` to connect to Remix IDE
 
 ## Compile and run on Remix IDE
 1. Select the "Solidity compiler" section and compile the contract
