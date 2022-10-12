@@ -4,13 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-interface Letter {
-    function getLetter() external view returns (string calldata);
-}
-
-contract A is ERC165, Letter {
-    string private letter;
-
+contract A is ERC165 {
     function supportsInterface(bytes4 interfaceId)
         public
         pure
@@ -22,8 +16,8 @@ contract A is ERC165, Letter {
             interfaceId == this.getLetter.selector;
     }
 
-    function getLetter() public view override returns (string memory) {
-        return letter;
+    function getLetter() public pure returns (string memory) {
+        return "A";
     }
 }
 
