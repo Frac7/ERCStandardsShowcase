@@ -21,3 +21,16 @@ If you use VS Code, install the Solidity extension.
 Contract A extends contact ERC165, which has only one function, and provides 2 functions (a getter and a setter); the result of "supportInterface" is calculated as the quality of the parameter and the selector for "supportInterface" or the XOR of getters and setters provided by the contract.
 
 Reference: https://eips.ethereum.org/EIPS/eip-165
+
+### ERC721Example
+Reference: https://eips.ethereum.org/EIPS/eip-721
+### ERC777Example
+Reference: https://eips.ethereum.org/EIPS/eip-777
+### ERC827Example
+Reference: https://github.com/ethereum/EIPs/issues/827
+### ERC884Example
+Reference: https://eips.ethereum.org/EIPS/eip-884
+### ERC1155Example
+Reference: https://eips.ethereum.org/EIPS/eip-1155
+### ERC4626Example
+Reference: https://eips.ethereum.org/EIPS/eip-4626
