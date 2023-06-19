@@ -4,12 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "connect": "remixd -s ."
+    "connect": "remixd -s .",
+    "prettier": "prettier --write *.sol"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@openzeppelin/contracts": "^4.7.3",
-    "@remix-project/remixd": "^0.6.7"
+    "@remix-project/remixd": "^0.6.7",
+    "prettier": "^2.8.8",
+    "prettier-plugin-solidity": "^1.1.3"
   }
 }

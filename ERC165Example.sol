@@ -6,18 +6,16 @@ import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 interface ILetter {
     function getLetter() external view returns (string memory);
+
     function setLetter(string memory) external;
 }
 
 contract A is ERC165, ILetter {
     string private letter;
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        pure
-        override
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public pure override returns (bool) {
         return
             interfaceId == this.supportsInterface.selector ||
             interfaceId == this.getLetter.selector ^ this.setLetter.selector;
@@ -43,11 +41,9 @@ contract B {
         a = _a;
     }
 
-    function checkIfASupportsInterface(bytes4 interfaceId)
-        public
-        view
-        returns (bool)
-    {
+    function checkIfASupportsInterface(
+        bytes4 interfaceId
+    ) public view returns (bool) {
         return ERC165(a).supportsInterface(interfaceId);
     }
 }
