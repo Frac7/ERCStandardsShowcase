@@ -1,7 +1,7 @@
 const truffleAssert = require("truffle-assertions");
 
 const A = artifacts.require("A");
-const LetterUseCase = artifacts.require("B");
+const LetterUseCase = artifacts.require("LetterUseCase");
 
 contract("ERC165Example", async (accounts) => {
   await A.deployed();
