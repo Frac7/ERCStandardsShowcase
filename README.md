@@ -23,6 +23,9 @@ Contract A extends contact ERC165, which has only one function, and provides 2 f
 Reference: https://eips.ethereum.org/EIPS/eip-165
 
 ### ERC721Example
+3. Install ganche globally using npm: https://github.com/trufflesuite/ganache#command-line-use
+4. Compile and deploy the ERC721Example contract using Ganache as provider
+
 Reference: https://eips.ethereum.org/EIPS/eip-721
 ### ERC777Example
 Reference: https://eips.ethereum.org/EIPS/eip-777
