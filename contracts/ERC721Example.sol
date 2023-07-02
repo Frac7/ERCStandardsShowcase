@@ -58,7 +58,7 @@ contract PlantUseCase {
         return _plantTokenContract.plantSeed(to);
     }
 
-    function exists(uint256 tokenId) public returns (bool) {
+    function exists(uint256 tokenId) public view returns (bool) {
         return _plantTokenContract.isAlive(tokenId);
     }
 
