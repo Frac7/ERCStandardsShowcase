@@ -3,5 +3,5 @@ const LetterUseCase = artifacts.require('LetterUseCase');
 
 module.exports = async function (deployer) {
   await deployer.deploy(A);
-  await deployer.deploy(LetterUseCase);
+  await deployer.deploy(LetterUseCase, A.address);
 };
