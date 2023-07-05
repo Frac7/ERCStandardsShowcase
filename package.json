@@ -8,7 +8,7 @@
     "prettier": "prettier --write *.sol",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
-    "test": "truffle test ./test/* --debug"
+    "test": "truffle test"
   },
   "author": "",
   "license": "ISC",

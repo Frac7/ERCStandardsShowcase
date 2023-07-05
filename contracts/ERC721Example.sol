@@ -11,8 +11,8 @@ contract Plant is ERC721 {
     constructor() ERC721("Plant", "PLN") {}
 
     function plantSeed(address to) public returns (uint256) {
-        _safeMint(to, _counter);
         _counter += 1;
+        _safeMint(to, _counter);
 
         return _counter;
     }
@@ -27,6 +27,10 @@ contract Plant is ERC721 {
 
     function uproot(uint256 tokenId) public {
         _burn(tokenId);
+    }
+
+    function getLastPlanted() public view returns (uint256) {
+        return _counter;
     }
 }
 
@@ -54,6 +58,16 @@ contract PlantUseCase {
     PlantReceiver private _plantReceiverContract;
     AnotherReceiver private _anotherReceiver;
 
+    constructor(address plant, address plantReceiver, address anotherReceiver) {
+        _plantTokenContract = Plant(plant);
+        _plantReceiverContract = PlantReceiver(plantReceiver);
+        _anotherReceiver = AnotherReceiver(anotherReceiver);
+    }
+
+    function getLastTokenId() public view returns (uint256) {
+        return _plantTokenContract.getLastPlanted();
+    }
+
     function mint(address to) public returns (uint256) {
         return _plantTokenContract.plantSeed(to);
     }
@@ -79,14 +93,19 @@ contract PlantUseCase {
     }
 
     function transferWithoutApproval(address from, uint256 tokenId) public {
-        _plantReceiverContract.transferFrom(from, address(_anotherReceiver), tokenId);
+        _plantReceiverContract.transferFrom(
+            from,
+            address(_anotherReceiver),
+            tokenId
+        );
     }
 
-    function transferWithApproval(
-        address from,
-        uint256 tokenId
-    ) public {
+    function transferWithApproval(address from, uint256 tokenId) public {
         _plantTokenContract.setApprovalForAll(address(_anotherReceiver), true);
-        _plantReceiverContract.transferFrom(from, address(_anotherReceiver), tokenId);
+        _plantReceiverContract.transferFrom(
+            from,
+            address(_anotherReceiver),
+            tokenId
+        );
     }
 }

@@ -1,5 +1,6 @@
 const A = artifacts.require("A");
 const LetterUseCase = artifacts.require("LetterUseCase");
+
 contract("ERC165Example", async (accounts) => {
   it("Should not support address(0)", async () => {
     await A.deployed();
