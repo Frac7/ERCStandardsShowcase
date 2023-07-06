@@ -91,21 +91,4 @@ contract PlantUseCase {
     function getOwner(uint256 tokenId) public view returns (address) {
         return _plantTokenContract.ownerOf(tokenId);
     }
-
-    function transferWithoutApproval(address from, uint256 tokenId) public {
-        _plantReceiverContract.transferFrom(
-            from,
-            address(_anotherReceiver),
-            tokenId
-        );
-    }
-
-    function transferWithApproval(address from, uint256 tokenId) public {
-        _plantTokenContract.setApprovalForAll(address(_anotherReceiver), true);
-        _plantReceiverContract.transferFrom(
-            from,
-            address(_anotherReceiver),
-            tokenId
-        );
-    }
 }
