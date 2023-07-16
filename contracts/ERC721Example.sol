@@ -32,6 +32,22 @@ contract Plant is ERC721 {
     function getLastPlanted() public view returns (uint256) {
         return _counter;
     }
+
+    function setNurseryman(uint256 tokenId, address to) public {
+        approve(to, tokenId);
+    }
+
+    function getNurseryman(uint256 tokenId) public view returns (address) {
+        return getApproved(tokenId);
+    }
+
+    function setNurserymanForAll(address operator) public {
+        setApprovalForAll(operator, true);
+    }
+
+    function isNurserymanForAll(address operator) public view returns (bool) {
+        return isApprovedForAll(msg.sender, operator);
+    }
 }
 
 contract PlantReceiver is IERC721Receiver {
