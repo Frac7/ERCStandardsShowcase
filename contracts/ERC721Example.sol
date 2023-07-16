@@ -30,7 +30,7 @@ contract Plant is ERC721 {
         address to,
         uint256 tokenId
     ) public {
-        transferFrom(from, to, tokenId);
+        safeTransferFrom(from, to, tokenId);
     }
 
     function uproot(uint256 tokenId) public {
