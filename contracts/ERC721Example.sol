@@ -26,9 +26,9 @@ contract Plant is ERC721 {
     }
 
     function giftFromNurseryman(
-        uint256 tokenId,
         address from,
-        address to
+        address to,
+        uint256 tokenId
     ) public {
         transferFrom(from, to, tokenId);
     }

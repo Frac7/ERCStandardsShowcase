@@ -117,7 +117,7 @@ contract("ERC721Example", async (accounts) => {
     const plant = await instance.getLastPlanted.call();
 
     truffleAssert.reverts(
-      instance.giftFromNurseryman(plant, accounts[0], accounts[1], {
+      instance.giftFromNurseryman(accounts[0], accounts[1], plant, {
         from: accounts[1],
       }),
       null,
@@ -125,7 +125,7 @@ contract("ERC721Example", async (accounts) => {
     );
     await instance.setNurseryman(plant, accounts[1], { from: accounts[0] });
 
-    await instance.giftFromNurseryman(plant, accounts[0], accounts[2], {
+    await instance.giftFromNurseryman(accounts[0], accounts[2], plant, {
       from: accounts[1],
     });
     assert.equal(await instance.ownerOf.call(plant), accounts[2]);
