@@ -80,42 +80,54 @@ contract("ERC721Example", async (accounts) => {
     const plant = await instance.getLastPlanted.call();
 
     truffleAssert.reverts(
-      instance.setNurseryman(plant, accounts[8], { from: accounts[8] })
+      instance.setNurseryman(plant, accounts[7], { from: accounts[7] }),
+      null,
+      "Must not approve if it isn't owner nor operator"
     );
 
     await instance.setNurseryman(plant, accounts[7], { from: accounts[6] });
     assert.equal(await instance.getNurseryman.call(plant), accounts[7]);
-
-    truffleAssert.reverts(
-      instance.gift(plant, accounts[8], { from: accounts[8] })
-    );
-
-    await instance.gift(plant, accounts[8], { from: accounts[7] });
-    assert.equal(instance.ownerOf.call(plant), accounts[8]);
   });
 
   it('Should approve a token from another "approved for all" address', async () => {
     const instance = await Plant.deployed();
 
-    await instance.plantSeed(accounts[9]);
+    await instance.plantSeed(accounts[7]);
     const plant = await instance.getLastPlanted.call();
 
-    await instance.setNurserymanForAll(accounts[0], { from: accounts[9] });
+    await instance.setNurserymanForAll(accounts[8], { from: accounts[7] });
     assert(
-      await instance.isNurserymanForAll.call(accounts[0], { from: accounts[9] })
+      await instance.isNurserymanForAll.call(accounts[8], { from: accounts[7] })
     );
+
+    await instance.setNurseryman(plant, accounts[9], { from: accounts[8] });
+    assert.equal(await instance.getNurseryman.call(plant), accounts[9]);
 
     truffleAssert.reverts(
-      instance.gift(plant, accounts[8], { from: accounts[8] })
+      instance.setNurseryman(plant, accounts[7], { from: accounts[7] }),
+      null,
+      "Must not approve if it isn't owner nor operator"
     );
-    await instance.gift(plant, accounts[8], { from: accounts[0] });
-    assert.equal(instance.ownerOf.call(plant), accounts[3]);
+  });
 
+  it("Should transfer a token only if it is an approved operator", async () => {
+    const instance = await Plant.deployed();
+
+    await instance.plantSeed(accounts[0]);
+    const plant = await instance.getLastPlanted.call();
+
+    truffleAssert.reverts(
+      instance.giftFromNurseryman(plant, accounts[0], accounts[1], {
+        from: accounts[1],
+      }),
+      null,
+      "Must not transfer if it isn't owner nor operator"
+    );
     await instance.setNurseryman(plant, accounts[1], { from: accounts[0] });
-    assert.equal(await instance.getNurseryman.call(plant), accounts[1]);
 
-    truffleAssert.reverts(
-      instance.setNurseryman(plant, accounts[2], { from: accounts[0] })
-    );
+    await instance.giftFromNurseryman(plant, accounts[0], accounts[2], {
+      from: accounts[1],
+    });
+    assert.equal(await instance.ownerOf.call(plant), accounts[2]);
   });
 });

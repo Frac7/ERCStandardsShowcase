@@ -25,6 +25,14 @@ contract Plant is ERC721 {
         safeTransferFrom(msg.sender, to, tokenId);
     }
 
+    function giftFromNurseryman(
+        uint256 tokenId,
+        address from,
+        address to
+    ) public {
+        transferFrom(from, to, tokenId);
+    }
+
     function uproot(uint256 tokenId) public {
         _burn(tokenId);
     }
