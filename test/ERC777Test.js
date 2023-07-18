@@ -8,6 +8,8 @@ contract("ERC777Example", async (accounts) => {
 
   it("Should receive tokens", async () => {});
 
+  it("Should send tokens with data", async () => {});
+
   it("Should not receive tokens", async () => {});
 
   it("Should transfer on bahalf of holder", async () => {});
