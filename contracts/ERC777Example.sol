@@ -3,7 +3,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC777/ERC777.sol";
-import "@openzeppelin/contracts/token/ERC777/ERC777TokensRecipient.sol";
+import "@openzeppelin/contracts/token/ERC777/IERC777TokensRecipient.sol";
 
 contract Mao is ERC777 {
     constructor(
@@ -14,7 +14,16 @@ contract Mao is ERC777 {
     }
 }
 
-contract MaoReceiver is ERC777TokensRecipient {}
+contract MaoReceiver is IERC777TokensRecipient {
+    function tokensReceived(
+        address operator,
+        address from,
+        address to,
+        uint256 amount,
+        bytes calldata userData,
+        bytes calldata operatorData
+    ) public {}
+}
 
 contract MaoOperator {}
 
