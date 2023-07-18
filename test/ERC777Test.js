@@ -15,4 +15,6 @@ contract("ERC777Example", async (accounts) => {
   it("Should transfer on bahalf of holder", async () => {});
 
   it("Should not transfer on bahalf of holder", async () => {});
+
+  it("Should notify token holder on transfer", async () => {});
 });
