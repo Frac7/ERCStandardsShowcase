@@ -1,10 +1,13 @@
-const Map = artifacts.require("Mao");
+const Mao = artifacts.require("Mao");
 const MaoReceiver = artifacts.require("MaoReceiver");
-const MaoOperator = artifacts.require("MaoOperator");
+const MaoHolder = artifacts.require("MaoHolder");
 const AnotherReceiver = artifacts.require("AnotherReceiver");
 
 contract("ERC777Example", async (accounts) => {
-  it("Should mint tokens", async () => {});
+  it("Should mint tokens", async () => {
+    const instance = await Mao.deployed();
+    assert.equal(await instance.totalSupply.call(), 50);
+  });
 
   it("Should receive tokens", async () => {});
 
