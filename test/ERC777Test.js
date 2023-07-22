@@ -1,6 +1,5 @@
 const Mao = artifacts.require("Mao");
-const MaoReceiver = artifacts.require("MaoReceiver");
-const MaoHolder = artifacts.require("MaoHolder");
+const MaoPlatform = artifacts.require("MaoPlatform");
 const AnotherReceiver = artifacts.require("AnotherReceiver");
 
 const isEqual = require("lodash/isEqual");
@@ -18,7 +17,16 @@ contract("ERC777Example", async (accounts) => {
     assert.equal(await this.instance.symbol.call(), "MAO");
   });
 
-  it("Should receive tokens", async function () {});
+  it("Should send tokens", async function () {
+    const receiver = await MaoPlatform.deployed();
+
+    await this.instance.send(receiver.address, 1, [], { from: accounts[0] });
+    assert.equal(await this.instance.balanceOf.call(receiver.address), 1);
+  });
+
+  it("Should transfer tokens", async function () {
+    const receiver = await MaoPlatform.deployed();
+  });
 
   it("Should send tokens with data", async function () {});
 
