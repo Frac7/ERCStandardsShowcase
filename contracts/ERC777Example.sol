@@ -20,7 +20,17 @@ contract Mao is ERC777 {
 
 // See https://github.com/OpenZeppelin/openzeppelin-contracts/blob/7c5f6bc2c8743d83443fa46395d75f2f3f99054a/contracts/mocks/ERC777SenderRecipientMock.sol
 contract MaoPlatform is IERC777Recipient, IERC777Sender, ERC1820Implementer {
-    constructor() {
+    bytes private _lastDataReceived;
+    bytes private _lastDataSent;
+
+    address private _mao;
+
+    constructor(address maoAddress) {
+        _mao = maoAddress;
+        _registerERC777Interfaces();
+    }
+
+    function _registerERC777Interfaces() private {
         IERC1820Registry _erc1820 = IERC1820Registry(
             0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
         );
@@ -57,7 +67,9 @@ contract MaoPlatform is IERC777Recipient, IERC777Sender, ERC1820Implementer {
         uint256 amount,
         bytes calldata userData,
         bytes calldata operatorData
-    ) public override {}
+    ) public override {
+        _lastDataReceived = userData;
+    }
 
     function tokensToSend(
         address operator,
@@ -66,5 +78,15 @@ contract MaoPlatform is IERC777Recipient, IERC777Sender, ERC1820Implementer {
         uint256 amount,
         bytes calldata userData,
         bytes calldata operatorData
-    ) public override {}
+    ) public override {
+        _lastDataSent = userData;
+    }
+
+    function getLastDataReceived() public view returns (bytes memory) {
+        return _lastDataReceived;
+    }
+
+    function getLastDataSent() public view returns (bytes memory) {
+        return _lastDataSent;
+    }
 }
