@@ -5,17 +5,17 @@ const AnotherReceiver = artifacts.require("AnotherReceiver");
 const { expectRevert } = require("@openzeppelin/test-helpers");
 const isEqual = require("lodash/isEqual");
 
-const { fromAscii, toAscii, fromWei, toWei } = require("web3-utils");
+const { fromAscii, toAscii } = require("web3-utils");
 
 contract("ERC777Example", async (accounts) => {
   beforeEach(async function () {
-    this.instance = await Mao.new(50, accounts);
+    this.instance = await Mao.new(50, [accounts[0]]);
   });
 
   it("Should mint tokens", async function () {
     assert.equal(await this.instance.totalSupply.call(), 50);
     assert.equal(await this.instance.balanceOf.call(accounts[0]), 50);
-    assert(isEqual(await this.instance.defaultOperators.call(), accounts));
+    assert(isEqual(await this.instance.defaultOperators.call(), [accounts[0]]));
     assert.equal(await this.instance.name.call(), "Mao");
     assert.equal(await this.instance.symbol.call(), "MAO");
   });
@@ -57,9 +57,16 @@ contract("ERC777Example", async (accounts) => {
       from: accounts[0],
     });
 
-    await this.instance.operatorSend(receiver.address, accounts[1], 2, [], []);
+    await this.instance.operatorSend(receiver.address, accounts[1], 1, [], [], {
+      from: accounts[0],
+    });
+    assert.equal(await this.instance.balanceOf.call(receiver.address), 1);
+    assert.equal(await this.instance.balanceOf.call(accounts[1]), 1);
+
+    await this.instance.operatorBurn(receiver.address, 1, [], [], {
+      from: accounts[0],
+    });
     assert.equal(await this.instance.balanceOf.call(receiver.address), 0);
-    assert.equal(await this.instance.balanceOf.call(accounts[1]), 2);
   });
 
   it("Should not transfer on behalf of holder", async function () {
@@ -104,6 +111,28 @@ contract("ERC777Example", async (accounts) => {
     assert.equal(
       toAscii(await receiver.getLastDataSent.call()),
       "Dolor sit amet"
+    );
+  });
+
+  it("Should authorize address", async function () {
+    await this.instance.send(accounts[2], 5, [], { from: accounts[0] });
+    await this.instance.authorizeOperator(accounts[1], { from: accounts[2] });
+
+    assert(await this.instance.isOperatorFor.call(accounts[1], accounts[2]));
+    await this.instance.operatorSend(accounts[2], accounts[3], 5, [], [], {
+      from: accounts[1],
+    });
+  });
+
+  it("Should revoke address", async function () {
+    await this.instance.authorizeOperator(accounts[1], { from: accounts[2] });
+    await this.instance.revokeOperator(accounts[1], { from: accounts[2] });
+
+    assert(!(await this.instance.isOperatorFor.call(accounts[1], accounts[2])));
+    expectRevert.unspecified(
+      this.instance.operatorSend(accounts[2], accounts[3], 5, [], [], {
+        from: accounts[1],
+      })
     );
   });
 });
