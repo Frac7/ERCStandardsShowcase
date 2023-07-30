@@ -1,4 +1,4 @@
-const Mao = artifacts.require("Mao");
+const MaoCoin = artifacts.require("MaoCoin");
 const MaoPlatform = artifacts.require("MaoPlatform");
 const AnotherReceiver = artifacts.require("AnotherReceiver");
 
@@ -9,14 +9,14 @@ const { fromAscii, toAscii } = require("web3-utils");
 
 contract("ERC777Example", async (accounts) => {
   beforeEach(async function () {
-    this.instance = await Mao.new(50, [accounts[0]]);
+    this.instance = await MaoCoin.new(50, [accounts[0]]);
   });
 
   it("Should mint tokens", async function () {
     assert.equal(await this.instance.totalSupply.call(), 50);
     assert.equal(await this.instance.balanceOf.call(accounts[0]), 50);
     assert(isEqual(await this.instance.defaultOperators.call(), [accounts[0]]));
-    assert.equal(await this.instance.name.call(), "Mao");
+    assert.equal(await this.instance.name.call(), "MaoCoin");
     assert.equal(await this.instance.symbol.call(), "MAO");
   });
 

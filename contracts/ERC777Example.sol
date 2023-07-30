@@ -9,11 +9,11 @@ import "@openzeppelin/contracts/token/ERC777/IERC777Sender.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC1820Registry.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC1820Implementer.sol";
 
-contract Mao is ERC777 {
+contract MaoCoin is ERC777 {
     constructor(
         uint256 initialSupply,
         address[] memory defaultOperators
-    ) ERC777("Mao", "MAO", defaultOperators) {
+    ) ERC777("MaoCoin", "MAO", defaultOperators) {
         _mint(msg.sender, initialSupply, "", "");
     }
 }
