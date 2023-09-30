@@ -6,9 +6,9 @@ const AnotherReceiver = artifacts.require("AnotherReceiver");
 
 contract("ERC1155Example", async function (accounts) {
   this.ids = [1, 2, 3, 4];
+  this.amounts = [1, 100, 1, 200];
 
   beforeEach(async function () {
-    this.amounts = Array(4).fill(parseInt(Math.random() * 100 + 1));
     this.instance = await HybridTokens.new(this.ids, this.amounts);
   });
 
