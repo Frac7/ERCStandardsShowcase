@@ -6,25 +6,19 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 contract HybridTokens is ERC1155 {
-    uint256 public constant FUNGIBLE_TOKEN = 0;
-    uint256 public constant NON_FUNGIBLE_TOKEN = 1;
-
-    uint256 public constant ANOTHER_FUNGIBLE_TOKEN = 2;
-    uint256 public constant ANOTHER_NON_FUNGIBLE_TOKEN = 3;
-
-    constructor() ERC1155("") {
-        _mint(msg.sender, FUNGIBLE_TOKEN, 100, "");
-        _mint(msg.sender, NON_FUNGIBLE_TOKEN, 1, "");
+    constructor(uint256[] memory ids, uint256[] memory amounts) ERC1155("") {
+        _mint(msg.sender, ids[0], amounts[ids[0]], "");
+        _mint(msg.sender, ids[1], amounts[ids[1]], "");
 
         uint256[] memory tokens = new uint256[](2);
-        tokens[0] = ANOTHER_FUNGIBLE_TOKEN;
-        tokens[1] = ANOTHER_NON_FUNGIBLE_TOKEN;
+        tokens[0] = ids[0];
+        tokens[1] = ids[1];
 
-        uint256[] memory amounts = new uint256[](2);
-        amounts[0] = 150;
-        amounts[1] = 5;
+        uint256[] memory batchAmounts = new uint256[](2);
+        batchAmounts[0] = amounts[ids[2]];
+        batchAmounts[1] = amounts[ids[3]];
 
-        _mintBatch(msg.sender, tokens, amounts, "");
+        _mintBatch(msg.sender, tokens, batchAmounts, "");
     }
 
     function transferToken(
