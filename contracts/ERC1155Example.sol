@@ -11,8 +11,8 @@ contract HybridTokens is ERC1155 {
         _mint(msg.sender, ids[1], amounts[ids[1]], "");
 
         uint256[] memory tokens = new uint256[](2);
-        tokens[0] = ids[0];
-        tokens[1] = ids[1];
+        tokens[0] = ids[2];
+        tokens[1] = ids[3];
 
         uint256[] memory batchAmounts = new uint256[](2);
         batchAmounts[0] = amounts[ids[2]];
@@ -68,9 +68,7 @@ contract HybridTokens is ERC1155 {
     }
 }
 
-contract HybridTokenReceiver is ERC1155Holder {
-    HybridTokens private _plantTokenContract;
-
+contract HybridTokensReceiver is ERC1155Holder {
     function onERC1155Received(
         address,
         address,
