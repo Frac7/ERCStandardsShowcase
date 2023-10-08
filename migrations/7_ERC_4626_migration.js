@@ -1,12 +1,8 @@
-const HybridTokens = artifacts.require("HybridTokens");
-const HybridTokensReceiver = artifacts.require("HybridTokensReceiver");
-const AnotherReceiver = artifacts.require("AnotherReceiver");
+const TokenAsset = artifacts.require("TokenAsset");
+const TokenVault = artifacts.require("TokenVault");
 
-module.exports = async function (deployer, network, accounts) {
-  const ids = [0, 1, 2, 3];
-  const amounts = [1, 100, 1, 200];
+module.exports = async function (deployer) {
 
-  await deployer.deploy(HybridTokens, ids, amounts, { from: accounts[0] });
-  await deployer.deploy(HybridTokensReceiver);
-  await deployer.deploy(AnotherReceiver);
+  await deployer.deploy(TokenAsset);
+  await deployer.deploy(TokenVault, TokenAsset.address);
 };
