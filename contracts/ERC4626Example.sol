@@ -5,7 +5,11 @@ pragma solidity >=0.7.0 <0.9.0;
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract TokenAsset is ERC20("Token", "TKN") {}
+contract TokenAsset is ERC20("Token", "TKN") {
+    constructor(uint256 amount) {
+        _mint(_msgSender(), amount);
+    }
+}
 
 contract TokenVault is ERC4626 {
     constructor(TokenAsset _asset) ERC4626(_asset) ERC20("Token", "TKN") {}
