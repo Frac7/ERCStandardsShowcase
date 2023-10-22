@@ -33,7 +33,7 @@ contract ERC827Proxy {
     function callContract(
         address _target,
         bytes memory _data
-    ) public payable returns (bool) {
+    ) public virtual payable returns (bool) {
         require(
             msg.sender == address(token),
             "Proxy only can execute calls from the token contract"
