@@ -9,21 +9,22 @@ contract("ERC827Example", async (accounts) => {
       from: accounts[0],
     });
 
-    this.instance = await WoffCoin.new(accounts[0], 50, this.proxy.constructor.bytecode, {
-      from: accounts[0],
-    });
+    this.instance = await WoffCoin.new(
+      accounts[0],
+      50,
+      this.proxy.constructor.deployedBytecode,
+      {
+        from: accounts[0],
+      }
+    );
   });
 
   it("Should transfer tokens and call the proxy contract function", async function () {
-    try {
-      await this.instance.customTransfer(accounts[1], 5, 0x0, {
-        from: accounts[0],
-      });
-      assert.equal(await this.instance.balanceOf.call(accounts[1]), 5);
-      assert(await this.proxy.isContractCalled.call());
-    } catch (error) {
-      console.error(error);
-    }
+    await this.instance.customTransfer(accounts[1], 5, 0x0, {
+      from: accounts[0],
+    });
+    assert.equal(await this.instance.balanceOf.call(accounts[1]), 5);
+    assert(await this.proxy.isContractCalled.call());
   });
 
   it("Should approve and transfer tokens and call the proxy contract function", async function () {
