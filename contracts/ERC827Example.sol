@@ -3,7 +3,6 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "./ERC827/contracts/ERC827.sol";
-import "./ERC827/contracts/ERC827Proxy.sol";
 
 contract WoffCoin is ERC827 {
     constructor(
@@ -37,23 +36,5 @@ contract WoffCoin is ERC827 {
         bytes memory _data
     ) public payable returns (bool) {
         return transferFromAndCall(_from, _to, _value, _data);
-    }
-}
-
-contract WoffProxy is ERC827Proxy {
-    bool contractCalled = false;
-
-    function callContract(
-        address _target,
-        bytes memory _data
-    ) public payable override returns (bool) {
-        if (super.callContract(_target, _data)) {
-            contractCalled = true;
-        }
-        return contractCalled;
-    }
-
-    function isContractCalled() public view returns (bool) {
-        return contractCalled;
     }
 }
