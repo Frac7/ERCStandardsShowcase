@@ -26,7 +26,7 @@ contract HybridTokens is ERC1155 {
         address to,
         uint256 id,
         uint256 amount,
-        bytes memory data
+        bytes calldata data
     ) public {
         return safeTransferFrom(from, to, id, amount, data);
     }
@@ -34,9 +34,9 @@ contract HybridTokens is ERC1155 {
     function transferTokens(
         address from,
         address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
+        uint256[] calldata ids,
+        uint256[] calldata amounts,
+        bytes calldata data
     ) public {
         return safeBatchTransferFrom(from, to, ids, amounts, data);
     }
@@ -49,8 +49,8 @@ contract HybridTokens is ERC1155 {
     }
 
     function getBalancesByAddressesAndTokens(
-        address[] memory accounts,
-        uint256[] memory ids
+        address[] calldata accounts,
+        uint256[] calldata ids
     ) public view returns (uint256[] memory) {
         return balanceOfBatch(accounts, ids);
     }
@@ -61,8 +61,8 @@ contract HybridTokens is ERC1155 {
 
     function burnTokens(
         address from,
-        uint256[] memory ids,
-        uint256[] memory amounts
+        uint256[] calldata ids,
+        uint256[] calldata amounts
     ) public {
         return _burnBatch(from, ids, amounts);
     }

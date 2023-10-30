@@ -5,9 +5,9 @@ pragma solidity >=0.7.0 <0.9.0;
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 interface ILetter {
-    function getLetter() external view returns (string memory);
+    function getLetter() external view returns (string calldata);
 
-    function setLetter(string memory) external;
+    function setLetter(string calldata) external;
 }
 
 contract A is ERC165, ILetter {
@@ -25,7 +25,7 @@ contract A is ERC165, ILetter {
         return letter;
     }
 
-    function setLetter(string memory _letter) public override {
+    function setLetter(string calldata _letter) public override {
         letter = _letter;
     }
 }

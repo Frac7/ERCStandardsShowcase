@@ -1,5 +1,6 @@
 const WoffCoin = artifacts.require("WoffCoin");
 const WoffProxy = artifacts.require("ERC827Proxy");
+const WoffReceiver = artifacts.require("WoffReceiver");
 
 const { fromAscii, toAscii } = require("web3-utils");
 
@@ -17,28 +18,40 @@ contract("ERC827Example", async (accounts) => {
         from: accounts[0],
       }
     );
+
+    this.receiver = await WoffReceiver.new(this.instance.address);
   });
 
-  it("Should transfer tokens and call the proxy contract function", async function () {
-    await this.instance.customTransfer(accounts[1], 5, 0x0, {
-      from: accounts[0],
-    });
-    assert.equal(await this.instance.balanceOf.call(accounts[1]), 5);
+  it("Should transfer tokens and call the contract function", async function () {
+    await this.instance.customTransfer(
+      this.receiver.address,
+      5,
+      fromAscii("Hola!"),
+      {
+        from: accounts[0],
+      }
+    );
+    assert.equal(await this.instance.balanceOf.call(this.receiver.address), 5);
+    assert.equal(await this.receiver.getData.call(), fromAscii("Hola!"));
   });
 
   it("Should approve and transfer tokens and call the proxy contract function", async function () {
-    await this.instance.customApprove(accounts[1], 5, fromAscii("Ciao!"), {
-      from: accounts[0],
-    });
-
-    await this.instance.customTransferFrom(
-      accounts[0],
-      accounts[2],
+    await this.instance.customApprove(
+      this.receiver.address,
       5,
       fromAscii("Ciao!"),
       {
-        from: accounts[1],
+        from: accounts[0],
       }
+    );
+    assert.equal(await this.receiver.getData.call(), fromAscii("Ciao!"));
+
+    await this.receiver.makeTransferFrom(
+      accounts[0],
+      accounts[2],
+      5,
+      fromAscii("Hi!"),
+      { from: accounts[0] }
     );
     assert.equal(await this.instance.balanceOf.call(accounts[2]), 5);
   });
