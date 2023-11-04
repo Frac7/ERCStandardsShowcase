@@ -8,8 +8,7 @@ This code has been adapted for the project context
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../utils/Create2.sol";
-// import "@openzeppelin\contracts\utils\Create2.sol";
+import "@openzeppelin/contracts/utils/Create2.sol";
 
 /**
  * @title ERC827, an extension of ERC20 token standard
@@ -100,7 +99,7 @@ abstract contract ERC827 is ERC20 {
         bytes32 salt = keccak256(
             abi.encodePacked(msg.sender, _to, nonces[msg.sender])
         );
-        address proxy = Create2.deploy(salt, proxyBytecode);
+        address proxy = Create2.deploy(0, salt, proxyBytecode);
         // solium-disable-next-line security/no-call-value, no-unused-vars
         (bool success, bytes memory data) = address(proxy).call{
             value: msg.value
