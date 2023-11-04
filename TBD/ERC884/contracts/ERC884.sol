@@ -1,6 +1,6 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.7.0 <0.9.0;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 
 /**
@@ -24,7 +24,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
  *
  *  @dev Ref https://github.com/ethereum/EIPs/pull/884
  */
-contract ERC884 is ERC20 {
+abstract contract ERC884 is ERC20 {
 
     /**
      *  This event is emitted when a verified address and associated identity hash are
@@ -85,7 +85,7 @@ contract ERC884 is ERC20 {
      *  @param addr The address of the person represented by the supplied hash.
      *  @param hash A cryptographic hash of the address holder's verified information.
      */
-    function addVerified(address addr, bytes32 hash) public;
+    function addVerified(address addr, bytes32 hash) public virtual;
 
     /**
      *  Remove a verified address, and the associated verification hash. If the address is
@@ -94,7 +94,7 @@ contract ERC884 is ERC20 {
      *  It MUST throw if an attempt is made to remove a verifiedAddress that owns Tokens.
      *  @param addr The verified address to be removed.
      */
-    function removeVerified(address addr) public;
+    function removeVerified(address addr) public virtual;
 
     /**
      *  Update the hash for a verified address known to the contract.
@@ -106,7 +106,7 @@ contract ERC884 is ERC20 {
      *  @param addr The verified address of the person represented by the supplied hash.
      *  @param hash A new cryptographic hash of the address holder's updated verified information.
      */
-    function updateVerified(address addr, bytes32 hash) public;
+    function updateVerified(address addr, bytes32 hash) public virtual;
 
     /**
      *  Cancel the original address and reissue the Tokens to the replacement address.
@@ -118,7 +118,7 @@ contract ERC884 is ERC20 {
      *  This function MUST emit the `VerifiedAddressSuperseded` event.
      *  @param original The address to be superseded. This address MUST NOT be reused.
      */
-    function cancelAndReissue(address original, address replacement) public;
+    function cancelAndReissue(address original, address replacement) public virtual;
 
     /**
      *  The `transfer` function MUST NOT allow transfers to addresses that
@@ -127,7 +127,7 @@ contract ERC884 is ERC20 {
      *  If the transfer will reduce `msg.sender`'s balance to 0 then that address
      *  MUST be removed from the list of shareholders.
      */
-    function transfer(address to, uint256 value) public returns (bool);
+    /* function transfer(address to, uint256 value) public returns (bool); */
 
     /**
      *  The `transferFrom` function MUST NOT allow transfers to addresses that
@@ -136,21 +136,21 @@ contract ERC884 is ERC20 {
      *  If the transfer will reduce `from`'s balance to 0 then that address
      *  MUST be removed from the list of shareholders.
      */
-    function transferFrom(address from, address to, uint256 value) public returns (bool);
+    /* function transferFrom(address from, address to, uint256 value) public returns (bool); */
 
     /**
      *  Tests that the supplied address is known to the contract.
      *  @param addr The address to test.
      *  @return true if the address is known to the contract.
      */
-    function isVerified(address addr) public view returns (bool);
+    function isVerified(address addr) public view virtual returns (bool);
 
     /**
      *  Checks to see if the supplied address is a share holder.
      *  @param addr The address to check.
      *  @return true if the supplied address owns a token.
      */
-    function isHolder(address addr) public view returns (bool);
+    function isHolder(address addr) public view virtual returns (bool);
 
     /**
      *  Checks that the supplied hash is associated with the given address.
@@ -158,13 +158,13 @@ contract ERC884 is ERC20 {
      *  @param hash The hash to test.
      *  @return true if the hash matches the one supplied with the address in `addVerified`, or `updateVerified`.
      */
-    function hasHash(address addr, bytes32 hash) public view returns (bool);
+    function hasHash(address addr, bytes32 hash) public view virtual returns (bool);
 
     /**
      *  The number of addresses that hold tokens.
      *  @return the number of unique addresses that hold tokens.
      */
-    function holderCount() public view returns (uint);
+    function holderCount() public view virtual returns (uint);
 
     /**
      *  By counting the number of token holders using `holderCount`
@@ -173,14 +173,14 @@ contract ERC884 is ERC20 {
      *  @param index The zero-based index of the holder.
      *  @return the address of the token holder with the given index.
      */
-    function holderAt(uint256 index) public view returns (address);
+    function holderAt(uint256 index) public view virtual returns (address);
 
     /**
      *  Checks to see if the supplied address was superseded.
      *  @param addr The address to check.
      *  @return true if the supplied address was superseded by another address.
      */
-    function isSuperseded(address addr) public view returns (bool);
+    function isSuperseded(address addr) public view virtual returns (bool);
 
     /**
      *  Gets the most recent address, given a superseded one.
@@ -189,5 +189,5 @@ contract ERC884 is ERC20 {
      *  @param addr The superseded address.
      *  @return the verified address that ultimately holds the share.
      */
-    function getCurrentFor(address addr) public view returns (address);
+    function getCurrentFor(address addr) public view virtual returns (address);
 }

@@ -1,8 +1,8 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.7.0 <0.9.0;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol';
-import './ERC884.sol';
-
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./MintableToken.sol";
+import "./ERC884.sol";
 
 /**
  *  An `ERC20` compatible token that conforms to Delaware State Senate,
@@ -22,10 +22,9 @@ import './ERC884.sol';
  *
  *  @dev Ref https://github.com/ethereum/EIPs/blob/master/EIPS/eip-884.md
  */
-contract ERC884ReferenceImpl is ERC884, MintableToken {
-
-    bytes32 constant private ZERO_BYTES = bytes32(0);
-    address constant private ZERO_ADDRESS = address(0);
+contract ERC884ReferenceImpl is ERC884 {
+    bytes32 private constant ZERO_BYTES = bytes32(0);
+    address private constant ZERO_ADDRESS = address(0);
 
     uint public decimals = 0;
 
@@ -61,13 +60,10 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      * @param _amount The amount of tokens to mint.
      * @return A boolean that indicates if the operation was successful.
      */
-    function mint(address _to, uint256 _amount)
-        public
-        onlyOwner
-        canMint
-        isVerifiedAddress(_to)
-        returns (bool)
-    {
+    function mint(
+        address _to,
+        uint256 _amount
+    ) public onlyOwner canMint isVerifiedAddress(_to) returns (bool) {
         // if the address does not already own share then
         // add the address to the shareholders array and record the index.
         updateShareholders(_to);
@@ -78,12 +74,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  The number of addresses that own tokens.
      *  @return the number of unique addresses that own tokens.
      */
-    function holderCount()
-        public
-        onlyOwner
-        view
-        returns (uint)
-    {
+    function holderCount() public view onlyOwner returns (uint) {
         return shareholders.length;
     }
 
@@ -94,12 +85,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param index The zero-based index of the holder.
      *  @return the address of the token holder with the given index.
      */
-    function holderAt(uint256 index)
-        public
-        onlyOwner
-        view
-        returns (address)
-    {
+    function holderAt(uint256 index) public view onlyOwner returns (address) {
         require(index < shareholders.length);
         return shareholders[index];
     }
@@ -112,11 +98,10 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param addr The address of the person represented by the supplied hash.
      *  @param hash A cryptographic hash of the address holder's verified information.
      */
-    function addVerified(address addr, bytes32 hash)
-        public
-        onlyOwner
-        isNotCancelled(addr)
-    {
+    function addVerified(
+        address addr,
+        bytes32 hash
+    ) public onlyOwner isNotCancelled(addr) {
         require(addr != ZERO_ADDRESS);
         require(hash != ZERO_BYTES);
         require(verified[addr] == ZERO_BYTES);
@@ -131,10 +116,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  It MUST throw if an attempt is made to remove a verifiedAddress that owns Tokens.
      *  @param addr The verified address to be removed.
      */
-    function removeVerified(address addr)
-        public
-        onlyOwner
-    {
+    function removeVerified(address addr) public onlyOwner {
         require(balances[addr] == 0);
         if (verified[addr] != ZERO_BYTES) {
             verified[addr] = ZERO_BYTES;
@@ -152,11 +134,10 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param addr The verified address of the person represented by the supplied hash.
      *  @param hash A new cryptographic hash of the address holder's updated verified information.
      */
-    function updateVerified(address addr, bytes32 hash)
-        public
-        onlyOwner
-        isVerifiedAddress(addr)
-    {
+    function updateVerified(
+        address addr,
+        bytes32 hash
+    ) public onlyOwner isVerifiedAddress(addr) {
         require(hash != ZERO_BYTES);
         bytes32 oldHash = verified[addr];
         if (oldHash != hash) {
@@ -175,7 +156,10 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param original The address to be superseded. This address MUST NOT be reused.
      *  @param replacement The address  that supersedes the original. This address MUST be verified.
      */
-    function cancelAndReissue(address original, address replacement)
+    function cancelAndReissue(
+        address original,
+        address replacement
+    )
         public
         onlyOwner
         isShareholder(original)
@@ -202,11 +186,10 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  If the transfer will reduce `msg.sender`'s balance to 0 then that address
      *  MUST be removed from the list of shareholders.
      */
-    function transfer(address to, uint256 value)
-        public
-        isVerifiedAddress(to)
-        returns (bool)
-    {
+    function transfer(
+        address to,
+        uint256 value
+    ) public isVerifiedAddress(to) returns (bool) {
         updateShareholders(to);
         pruneShareholders(msg.sender, value);
         return super.transfer(to, value);
@@ -219,11 +202,11 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  If the transfer will reduce `from`'s balance to 0 then that address
      *  MUST be removed from the list of shareholders.
      */
-    function transferFrom(address from, address to, uint256 value)
-        public
-        isVerifiedAddress(to)
-        returns (bool)
-    {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) public isVerifiedAddress(to) returns (bool) {
         updateShareholders(to);
         pruneShareholders(from, value);
         return super.transferFrom(from, to, value);
@@ -234,11 +217,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param addr The address to test.
      *  @return true if the address is known to the contract.
      */
-    function isVerified(address addr)
-        public
-        view
-        returns (bool)
-    {
+    function isVerified(address addr) public view returns (bool) {
         return verified[addr] != ZERO_BYTES;
     }
 
@@ -247,11 +226,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param addr The address to check.
      *  @return true if the supplied address owns a token.
      */
-    function isHolder(address addr)
-        public
-        view
-        returns (bool)
-    {
+    function isHolder(address addr) public view returns (bool) {
         return holderIndices[addr] != 0;
     }
 
@@ -261,11 +236,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param hash The hash to test.
      *  @return true if the hash matches the one supplied with the address in `addVerified`, or `updateVerified`.
      */
-    function hasHash(address addr, bytes32 hash)
-        public
-        view
-        returns (bool)
-    {
+    function hasHash(address addr, bytes32 hash) public view returns (bool) {
         if (addr == ZERO_ADDRESS) {
             return false;
         }
@@ -277,12 +248,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param addr The address to check.
      *  @return true if the supplied address was superseded by another address.
      */
-    function isSuperseded(address addr)
-        public
-        view
-        onlyOwner
-        returns (bool)
-    {
+    function isSuperseded(address addr) public view onlyOwner returns (bool) {
         return cancellations[addr] != ZERO_ADDRESS;
     }
 
@@ -293,12 +259,9 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param addr The superseded address.
      *  @return the verified address that ultimately holds the share.
      */
-    function getCurrentFor(address addr)
-        public
-        view
-        onlyOwner
-        returns (address)
-    {
+    function getCurrentFor(
+        address addr
+    ) public view onlyOwner returns (address) {
         return findCurrentFor(addr);
     }
 
@@ -307,11 +270,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param addr The superseded address.
      *  @return the verified address that ultimately holds the share.
      */
-    function findCurrentFor(address addr)
-        internal
-        view
-        returns (address)
-    {
+    function findCurrentFor(address addr) internal view returns (address) {
         address candidate = cancellations[addr];
         if (candidate == ZERO_ADDRESS) {
             return addr;
@@ -324,9 +283,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  and update the `holderIndices` mapping.
      *  @param addr The address to add as a shareholder if it's not already.
      */
-    function updateShareholders(address addr)
-        internal
-    {
+    function updateShareholders(address addr) internal {
         if (holderIndices[addr] == 0) {
             holderIndices[addr] = shareholders.push(addr);
         }
@@ -339,9 +296,7 @@ contract ERC884ReferenceImpl is ERC884, MintableToken {
      *  @param addr The address to prune if their balance will be reduced to 0.
      @  @dev see https://ethereum.stackexchange.com/a/39311
      */
-    function pruneShareholders(address addr, uint256 value)
-        internal
-    {
+    function pruneShareholders(address addr, uint256 value) internal {
         uint256 balance = balances[addr] - value;
         if (balance > 0) {
             return;
