@@ -23,10 +23,9 @@ contract TweetShare is ERC884ReferenceImpl {
         cancelAndReissue(from, to);
     }
 
-    function approveVerifyAndTransferFrom(address to, uint256 amount) public {
+    function approveAndVerify(address to, uint256 amount) public {
         approve(to, amount);
         bytes32 hash = keccak256(abi.encodePacked(to, "TweetShare"));
         addVerified(to, hash);
-        transferFrom(msg.sender, to, amount);
     }
 }
