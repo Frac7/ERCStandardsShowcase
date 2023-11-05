@@ -2,7 +2,6 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-
 /**
  *  An `ERC20` compatible token that conforms to Delaware State Senate,
  *  149th General Assembly, Senate Bill No. 69: An act to Amend Title 8
@@ -25,7 +24,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  *  @dev Ref https://github.com/ethereum/EIPs/pull/884
  */
 abstract contract ERC884 is ERC20 {
-
     /**
      *  This event is emitted when a verified address and associated identity hash are
      *  added to the contract.
@@ -118,7 +116,10 @@ abstract contract ERC884 is ERC20 {
      *  This function MUST emit the `VerifiedAddressSuperseded` event.
      *  @param original The address to be superseded. This address MUST NOT be reused.
      */
-    function cancelAndReissue(address original, address replacement) public virtual;
+    function cancelAndReissue(
+        address original,
+        address replacement
+    ) public virtual;
 
     /**
      *  The `transfer` function MUST NOT allow transfers to addresses that
@@ -158,7 +159,10 @@ abstract contract ERC884 is ERC20 {
      *  @param hash The hash to test.
      *  @return true if the hash matches the one supplied with the address in `addVerified`, or `updateVerified`.
      */
-    function hasHash(address addr, bytes32 hash) public view virtual returns (bool);
+    function hasHash(
+        address addr,
+        bytes32 hash
+    ) public view virtual returns (bool);
 
     /**
      *  The number of addresses that hold tokens.

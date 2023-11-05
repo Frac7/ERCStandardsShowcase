@@ -1,7 +1,5 @@
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./MintableToken.sol";
 import "./ERC884.sol";
 
 /**
@@ -22,17 +20,27 @@ import "./ERC884.sol";
  *
  *  @dev Ref https://github.com/ethereum/EIPs/blob/master/EIPS/eip-884.md
  */
-contract ERC884ReferenceImpl is ERC884 {
+abstract contract ERC884ReferenceImpl is ERC884 {
     bytes32 private constant ZERO_BYTES = bytes32(0);
     address private constant ZERO_ADDRESS = address(0);
-
-    uint public decimals = 0;
+    /* 
+    uint public decimals = 0; */
 
     mapping(address => bytes32) private verified;
     mapping(address => address) private cancellations;
     mapping(address => uint256) private holderIndices;
 
     address[] private shareholders;
+
+    address private owner;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function decimals() public pure override returns (uint8) {
+        return 0;
+    }
 
     modifier isVerifiedAddress(address addr) {
         require(verified[addr] != ZERO_BYTES);
@@ -55,26 +63,33 @@ contract ERC884ReferenceImpl is ERC884 {
     }
 
     /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    /**
      * As each token is minted it is added to the shareholders array.
      * @param _to The address that will receive the minted tokens.
      * @param _amount The amount of tokens to mint.
-     * @return A boolean that indicates if the operation was successful.
      */
     function mint(
         address _to,
         uint256 _amount
-    ) public onlyOwner canMint isVerifiedAddress(_to) returns (bool) {
+    ) public onlyOwner isVerifiedAddress(_to) {
         // if the address does not already own share then
         // add the address to the shareholders array and record the index.
         updateShareholders(_to);
-        return super.mint(_to, _amount);
+        _mint(_to, _amount);
     }
 
     /**
      *  The number of addresses that own tokens.
      *  @return the number of unique addresses that own tokens.
      */
-    function holderCount() public view onlyOwner returns (uint) {
+    function holderCount() public view override onlyOwner returns (uint) {
         return shareholders.length;
     }
 
@@ -85,7 +100,9 @@ contract ERC884ReferenceImpl is ERC884 {
      *  @param index The zero-based index of the holder.
      *  @return the address of the token holder with the given index.
      */
-    function holderAt(uint256 index) public view onlyOwner returns (address) {
+    function holderAt(
+        uint256 index
+    ) public view override onlyOwner returns (address) {
         require(index < shareholders.length);
         return shareholders[index];
     }
@@ -101,7 +118,7 @@ contract ERC884ReferenceImpl is ERC884 {
     function addVerified(
         address addr,
         bytes32 hash
-    ) public onlyOwner isNotCancelled(addr) {
+    ) public override onlyOwner isNotCancelled(addr) {
         require(addr != ZERO_ADDRESS);
         require(hash != ZERO_BYTES);
         require(verified[addr] == ZERO_BYTES);
@@ -116,8 +133,8 @@ contract ERC884ReferenceImpl is ERC884 {
      *  It MUST throw if an attempt is made to remove a verifiedAddress that owns Tokens.
      *  @param addr The verified address to be removed.
      */
-    function removeVerified(address addr) public onlyOwner {
-        require(balances[addr] == 0);
+    function removeVerified(address addr) public override onlyOwner {
+        require(balanceOf(addr) == 0);
         if (verified[addr] != ZERO_BYTES) {
             verified[addr] = ZERO_BYTES;
             emit VerifiedAddressRemoved(addr, msg.sender);
@@ -137,7 +154,7 @@ contract ERC884ReferenceImpl is ERC884 {
     function updateVerified(
         address addr,
         bytes32 hash
-    ) public onlyOwner isVerifiedAddress(addr) {
+    ) public override onlyOwner isVerifiedAddress(addr) {
         require(hash != ZERO_BYTES);
         bytes32 oldHash = verified[addr];
         if (oldHash != hash) {
@@ -161,6 +178,7 @@ contract ERC884ReferenceImpl is ERC884 {
         address replacement
     )
         public
+        override
         onlyOwner
         isShareholder(original)
         isNotShareholder(replacement)
@@ -174,8 +192,11 @@ contract ERC884ReferenceImpl is ERC884 {
         shareholders[holderIndex] = replacement;
         holderIndices[replacement] = holderIndices[original];
         holderIndices[original] = 0;
-        balances[replacement] = balances[original];
-        balances[original] = 0;
+
+        /*         _balances[replacement] = _balances[original];
+        _balances[original] = 0; */
+        transferFrom(original, replacement, balanceOf(original));
+
         emit VerifiedAddressSuperseded(original, replacement, msg.sender);
     }
 
@@ -189,7 +210,7 @@ contract ERC884ReferenceImpl is ERC884 {
     function transfer(
         address to,
         uint256 value
-    ) public isVerifiedAddress(to) returns (bool) {
+    ) public override isVerifiedAddress(to) returns (bool) {
         updateShareholders(to);
         pruneShareholders(msg.sender, value);
         return super.transfer(to, value);
@@ -206,7 +227,7 @@ contract ERC884ReferenceImpl is ERC884 {
         address from,
         address to,
         uint256 value
-    ) public isVerifiedAddress(to) returns (bool) {
+    ) public override isVerifiedAddress(to) returns (bool) {
         updateShareholders(to);
         pruneShareholders(from, value);
         return super.transferFrom(from, to, value);
@@ -217,7 +238,7 @@ contract ERC884ReferenceImpl is ERC884 {
      *  @param addr The address to test.
      *  @return true if the address is known to the contract.
      */
-    function isVerified(address addr) public view returns (bool) {
+    function isVerified(address addr) public view override returns (bool) {
         return verified[addr] != ZERO_BYTES;
     }
 
@@ -226,7 +247,7 @@ contract ERC884ReferenceImpl is ERC884 {
      *  @param addr The address to check.
      *  @return true if the supplied address owns a token.
      */
-    function isHolder(address addr) public view returns (bool) {
+    function isHolder(address addr) public view override returns (bool) {
         return holderIndices[addr] != 0;
     }
 
@@ -236,7 +257,10 @@ contract ERC884ReferenceImpl is ERC884 {
      *  @param hash The hash to test.
      *  @return true if the hash matches the one supplied with the address in `addVerified`, or `updateVerified`.
      */
-    function hasHash(address addr, bytes32 hash) public view returns (bool) {
+    function hasHash(
+        address addr,
+        bytes32 hash
+    ) public view override returns (bool) {
         if (addr == ZERO_ADDRESS) {
             return false;
         }
@@ -248,7 +272,9 @@ contract ERC884ReferenceImpl is ERC884 {
      *  @param addr The address to check.
      *  @return true if the supplied address was superseded by another address.
      */
-    function isSuperseded(address addr) public view onlyOwner returns (bool) {
+    function isSuperseded(
+        address addr
+    ) public view override onlyOwner returns (bool) {
         return cancellations[addr] != ZERO_ADDRESS;
     }
 
@@ -261,7 +287,7 @@ contract ERC884ReferenceImpl is ERC884 {
      */
     function getCurrentFor(
         address addr
-    ) public view onlyOwner returns (address) {
+    ) public view override returns (address) {
         return findCurrentFor(addr);
     }
 
@@ -285,7 +311,9 @@ contract ERC884ReferenceImpl is ERC884 {
      */
     function updateShareholders(address addr) internal {
         if (holderIndices[addr] == 0) {
-            holderIndices[addr] = shareholders.push(addr);
+            /* holderIndices[addr] = shareholders.push(addr); */
+            shareholders.push(addr);
+            holderIndices[addr] = shareholders.length - 1;
         }
     }
 
@@ -297,7 +325,7 @@ contract ERC884ReferenceImpl is ERC884 {
      @  @dev see https://ethereum.stackexchange.com/a/39311
      */
     function pruneShareholders(address addr, uint256 value) internal {
-        uint256 balance = balances[addr] - value;
+        uint256 balance = balanceOf(addr) - value;
         if (balance > 0) {
             return;
         }
@@ -310,7 +338,7 @@ contract ERC884ReferenceImpl is ERC884 {
         // ref https://github.com/davesag/ERC884-reference-implementation/issues/20
         holderIndices[lastHolder] = holderIndices[addr];
         // trim the shareholders array (which drops the last entry)
-        shareholders.length--;
+        shareholders.pop();
         // and zero out the index for addr
         holderIndices[addr] = 0;
     }

@@ -2,7 +2,7 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-import "./ERC827/contracts/ERC827.sol";
+import "./ERC827/ERC827.sol";
 
 contract WoffCoin is ERC827 {
     constructor(
