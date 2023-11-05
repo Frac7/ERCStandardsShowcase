@@ -21,7 +21,7 @@ contract ERC827Proxy {
     /**
      * @dev constructor
      */
-    constructor() public {
+    constructor() {
         token = IERC827(msg.sender);
     }
 

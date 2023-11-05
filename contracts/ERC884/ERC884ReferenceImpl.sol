@@ -1,3 +1,7 @@
+/**
+The original code is available here: https://github.com/davesag/ERC884-reference-implementation
+This code has been adapted for the project context
+ */
 pragma solidity >=0.7.0 <0.9.0;
 
 import "./ERC884.sol";
@@ -23,8 +27,6 @@ import "./ERC884.sol";
 abstract contract ERC884ReferenceImpl is ERC884 {
     bytes32 private constant ZERO_BYTES = bytes32(0);
     address private constant ZERO_ADDRESS = address(0);
-    /* 
-    uint public decimals = 0; */
 
     mapping(address => bytes32) private verified;
     mapping(address => address) private cancellations;
@@ -43,22 +45,22 @@ abstract contract ERC884ReferenceImpl is ERC884 {
     }
 
     modifier isVerifiedAddress(address addr) {
-        require(verified[addr] != ZERO_BYTES);
+        require(verified[addr] != ZERO_BYTES, "isVerifiedAddress");
         _;
     }
 
     modifier isShareholder(address addr) {
-        require(holderIndices[addr] != 0);
+        require(holderIndices[addr] != 0, "isShareholder");
         _;
     }
 
     modifier isNotShareholder(address addr) {
-        require(holderIndices[addr] == 0);
+        require(holderIndices[addr] == 0, "isNotShareholder");
         _;
     }
 
     modifier isNotCancelled(address addr) {
-        require(cancellations[addr] == ZERO_ADDRESS);
+        require(cancellations[addr] == ZERO_ADDRESS, "isNotCancelled");
         _;
     }
 
@@ -66,7 +68,7 @@ abstract contract ERC884ReferenceImpl is ERC884 {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "onlyOnwer");
         _;
     }
 
@@ -188,13 +190,7 @@ abstract contract ERC884ReferenceImpl is ERC884 {
         // and update all the associated mappings
         verified[original] = ZERO_BYTES;
         cancellations[original] = replacement;
-        uint256 holderIndex = holderIndices[original] - 1;
-        shareholders[holderIndex] = replacement;
-        holderIndices[replacement] = holderIndices[original];
-        holderIndices[original] = 0;
 
-        /*         _balances[replacement] = _balances[original];
-        _balances[original] = 0; */
         transferFrom(original, replacement, balanceOf(original));
 
         emit VerifiedAddressSuperseded(original, replacement, msg.sender);
@@ -311,9 +307,8 @@ abstract contract ERC884ReferenceImpl is ERC884 {
      */
     function updateShareholders(address addr) internal {
         if (holderIndices[addr] == 0) {
-            /* holderIndices[addr] = shareholders.push(addr); */
             shareholders.push(addr);
-            holderIndices[addr] = shareholders.length - 1;
+            holderIndices[addr] = shareholders.length;
         }
     }
 
