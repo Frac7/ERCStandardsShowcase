@@ -6,7 +6,6 @@ import "./ERC5484/IERC5484.sol";
 contract CSToken is ERC5192, IERC5484 {
     mapping(uint256 => BurnAuth) private _burnAuthById;
     address private _issuer;
-    mapping(uint256 => address) private _ownersById;
 
     error ErrOnlyIssuer();
     modifier onlyIssuer() {
@@ -18,7 +17,9 @@ contract CSToken is ERC5192, IERC5484 {
         _issuer = msg.sender;
     }
 
-    function burnAuth(uint256 tokenId) external view override returns (BurnAuth) {
+    function burnAuth(
+        uint256 tokenId
+    ) external view override returns (BurnAuth) {
         return _burnAuthById[tokenId];
     }
 
@@ -36,7 +37,6 @@ contract CSToken is ERC5192, IERC5484 {
         BurnAuth _burnAuth
     ) public onlyIssuer {
         super._mint(to, tokenId);
-        _ownersById[tokenId] = to;
         _burnAuthById[tokenId] = _burnAuth;
         emit Issued(msg.sender, to, tokenId, _burnAuth);
     }
@@ -46,17 +46,17 @@ contract CSToken is ERC5192, IERC5484 {
             require(msg.sender == _issuer, "Only issuer");
             super._burn(tokenId);
         } else if (_burnAuthById[tokenId] == BurnAuth.OwnerOnly) {
-            require(msg.sender == _ownersById[tokenId], "Only owner");
+            require(msg.sender == _ownerOf(tokenId), "Only owner");
             super._burn(tokenId);
         } else if (_burnAuthById[tokenId] == BurnAuth.Both) {
             require(
-                msg.sender == _issuer || msg.sender == _ownersById[tokenId],
+                msg.sender == _issuer || msg.sender == _ownerOf(tokenId),
                 "Only issuer or owner"
             );
             super._burn(tokenId);
         } else if (_burnAuthById[tokenId] == BurnAuth.Neither) {
             require(
-                msg.sender != _issuer && msg.sender != _ownersById[tokenId],
+                msg.sender != _issuer && msg.sender != _ownerOf(tokenId),
                 "Neither"
             );
             super._burn(tokenId);
