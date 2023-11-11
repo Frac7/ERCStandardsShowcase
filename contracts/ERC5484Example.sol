@@ -62,4 +62,8 @@ contract CSToken is ERC5192, IERC5484 {
             super._burn(tokenId);
         }
     }
+
+    function exists(uint256 tokenId) public returns (bool) {
+        return _exists(tokenId);
+    }
 }

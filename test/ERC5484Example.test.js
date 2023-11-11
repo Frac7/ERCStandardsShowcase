@@ -16,9 +16,14 @@ contract("ERC5192Example", async function (accounts) {
       }),
       "Only issuer"
     );
+
+    assert(await this.instance.exists.call(0));
+
     await this.instance.burn(0, {
       from: accounts[0],
     });
+
+    assert(!(await this.instance.exists.call(0)));
   });
 
   it("Only issuer should burn", async function () {
