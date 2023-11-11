@@ -1,6 +1,5 @@
 const A = artifacts.require("A");
 const LetterUseCase = artifacts.require("LetterUseCase");
-const { makeInterfaceId } = require("@openzeppelin/test-helpers");
 
 contract("ERC165Example", async function (accounts) {
   beforeEach(async function () {
@@ -21,12 +20,4 @@ contract("ERC165Example", async function (accounts) {
   it("Should support 0x01ffc9a7", async function () {
     assert(await this.useCaseInstance.checkIfASupportsInterface("0x35e23170"));
   });
-
-  /*it("Should support calculate interface ID", async function () {
-    assert(
-      await this.useCaseInstance.checkIfASupportsInterface(
-        makeInterfaceId.ERC165(["0x01ffc9a7"]) // TODO: Change arguments
-      )
-    );
-  });*/
 });

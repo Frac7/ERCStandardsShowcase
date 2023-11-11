@@ -2,6 +2,8 @@ const CSToken = artifacts.require("CSToken");
 const { expectRevert } = require("@openzeppelin/test-helpers");
 
 contract("ERC5192Example", async function (accounts) {
+  const ID = 0;
+
   beforeEach(async function () {
     this.instance = await CSToken.new({
       from: accounts[0],
@@ -9,9 +11,10 @@ contract("ERC5192Example", async function (accounts) {
   });
 
   it("Only issuer should burn", async function () {
-    await this.instance.safeMint(accounts[1], 0, 0);
+    const ONLY_ISSUER = 0;
+    await this.instance.safeMint(accounts[1], ID, ONLY_ISSUER);
     expectRevert(
-      this.instance.burn(0, {
+      this.instance.burn(ID, {
         from: accounts[1],
       }),
       "Only issuer"
@@ -19,30 +22,32 @@ contract("ERC5192Example", async function (accounts) {
 
     assert(await this.instance.exists.call(0));
 
-    await this.instance.burn(0, {
+    await this.instance.burn(ID, {
       from: accounts[0],
     });
 
-    assert(!(await this.instance.exists.call(0)));
+    assert.isFalse(await this.instance.exists.call(0));
   });
 
-  it("Only issuer should burn", async function () {
-    await this.instance.safeMint(accounts[1], 0, 1);
+  it("Only owner should burn", async function () {
+    const ONLY_OWNER = 1;
+    await this.instance.safeMint(accounts[1], ID, ONLY_OWNER);
     expectRevert(
-      this.instance.burn(0, {
+      this.instance.burn(ID, {
         from: accounts[0],
       }),
       "Only owner"
     );
-    await this.instance.burn(0, {
+    await this.instance.burn(ID, {
       from: accounts[1],
     });
   });
 
   it("Only issuer or owner should burn", async function () {
-    await this.instance.safeMint(accounts[1], 0, 2);
+    const BOTH = 2;
+    await this.instance.safeMint(accounts[1], ID, BOTH);
     expectRevert(
-      this.instance.burn(0, {
+      this.instance.burn(ID, {
         from: accounts[2],
       }),
       "Only issuer or owner"
@@ -50,15 +55,16 @@ contract("ERC5192Example", async function (accounts) {
   });
 
   it("Neither should burn", async function () {
-    await this.instance.safeMint(accounts[1], 0, 3);
+    const NEITHER = 3;
+    await this.instance.safeMint(accounts[1], ID, NEITHER);
     expectRevert(
-      this.instance.burn(0, {
+      this.instance.burn(ID, {
         from: accounts[0],
       }),
       "Neither"
     );
     expectRevert(
-      this.instance.burn(0, {
+      this.instance.burn(ID, {
         from: accounts[1],
       }),
       "Neither"

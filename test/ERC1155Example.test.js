@@ -1,6 +1,7 @@
 const { expectRevert } = require("@openzeppelin/test-helpers");
 
 const isEqual = require("lodash/isEqual");
+const { fromAscii } = require("web3-utils");
 
 const HybridTokens = artifacts.require("HybridTokens");
 const HybridTokensReceiver = artifacts.require("HybridTokensReceiver");
@@ -60,7 +61,7 @@ contract("ERC1155Example", async function (accounts) {
       accounts[1],
       ids.slice(0, 2),
       [1, 1],
-      0x0,
+      fromAscii(""),
       { from: accounts[0] }
     );
     assert(
@@ -97,7 +98,7 @@ contract("ERC1155Example", async function (accounts) {
         AnotherReceiver.address,
         ids[1],
         1,
-        0x0,
+        fromAscii(""),
         {
           from: accounts[0],
         }

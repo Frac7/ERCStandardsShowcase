@@ -4,6 +4,8 @@ const WoffReceiver = artifacts.require("WoffReceiver");
 
 const { fromAscii, toAscii } = require("web3-utils");
 
+const TOTAL_SUPPLY = 50;
+
 contract("ERC827Example", async (accounts) => {
   beforeEach(async function () {
     const proxy = await WoffProxy.new({
@@ -12,7 +14,7 @@ contract("ERC827Example", async (accounts) => {
 
     this.instance = await WoffCoin.new(
       accounts[0],
-      50,
+      TOTAL_SUPPLY,
       proxy.constructor.bytecode,
       {
         from: accounts[0],
@@ -23,36 +25,42 @@ contract("ERC827Example", async (accounts) => {
   });
 
   it("Should transfer tokens and call the contract function", async function () {
+    const DATA = "Lorem ipsum";
+    const AMOUNT = 5;
+
     await this.instance.customTransfer(
       this.receiver.address,
-      5,
-      fromAscii("Hola!"),
+      AMOUNT,
+      fromAscii(DATA),
       {
         from: accounts[0],
       }
     );
-    assert.equal(await this.instance.balanceOf.call(this.receiver.address), 5);
-    assert.equal(await this.receiver.getData.call(), fromAscii("Hola!"));
+    assert.equal(await this.instance.balanceOf.call(this.receiver.address), AMOUNT);
+    assert.equal(toAscii(await this.receiver.getData.call()), DATA);
   });
 
   it("Should approve and transfer tokens and call the proxy contract function", async function () {
+    const DATA = "Lorem ipsum";
+    const AMOUNT = 5;
+
     await this.instance.customApprove(
       this.receiver.address,
-      5,
-      fromAscii("Ciao!"),
+      AMOUNT,
+      fromAscii(DATA),
       {
         from: accounts[0],
       }
     );
-    assert.equal(await this.receiver.getData.call(), fromAscii("Ciao!"));
+    assert.equal(toAscii(await this.receiver.getData.call()), DATA);
 
     await this.receiver.makeTransferFrom(
       accounts[0],
       accounts[2],
       5,
-      fromAscii("Hi!"),
+      fromAscii(DATA),
       { from: accounts[0] }
     );
-    assert.equal(await this.instance.balanceOf.call(accounts[2]), 5);
+    assert.equal(await this.instance.balanceOf.call(accounts[2]), AMOUNT);
   });
 });
