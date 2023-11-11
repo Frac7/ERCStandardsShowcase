@@ -1,4 +1,4 @@
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.1;
 
 import "./ERC5192/ERC5192.sol";
 import "./ERC5484/IERC5484.sol";
@@ -18,7 +18,7 @@ contract CSToken is ERC5192, IERC5484 {
         _issuer = msg.sender;
     }
 
-    function burnAuth(uint256 tokenId) external view returns (BurnAuth) {
+    function burnAuth(uint256 tokenId) external view override returns (BurnAuth) {
         return _burnAuthById[tokenId];
     }
 
@@ -33,12 +33,12 @@ contract CSToken is ERC5192, IERC5484 {
     function safeMint(
         address to,
         uint256 tokenId,
-        BurnAuth burnAuth
+        BurnAuth _burnAuth
     ) public onlyIssuer {
         super._mint(to, tokenId);
         _ownersById[tokenId] = to;
-        _burnAuthById[tokenId] = burnAuth;
-        emit Issued(msg.sender, to, tokenId, burnAuth);
+        _burnAuthById[tokenId] = _burnAuth;
+        emit Issued(msg.sender, to, tokenId, _burnAuth);
     }
 
     function burn(uint256 tokenId) public {

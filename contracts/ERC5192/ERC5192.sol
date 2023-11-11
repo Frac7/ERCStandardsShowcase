@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.1;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
@@ -24,7 +24,7 @@ abstract contract ERC5192 is ERC721, IERC5192 {
         _;
     }
 
-    function locked(uint256 tokenId) external view returns (bool) {
+    function locked(uint256 tokenId) external view override returns (bool) {
         if (!_exists(tokenId)) revert ErrNotFound();
         return isLocked;
     }

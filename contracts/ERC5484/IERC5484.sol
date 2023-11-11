@@ -3,7 +3,7 @@
  */
 
 // SPDX-License-Identifier: CC0-1.0
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.1;
 
 interface IERC5484 {
     /// A guideline to standardlize burn-authorization's number coding
