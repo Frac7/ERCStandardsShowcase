@@ -1,5 +1,65 @@
-// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.13;
 
-pragma solidity >=0.7.0 <0.9.0;
+import "./ERC5192/ERC5192.sol";
+import "./ERC5484/IERC5484.sol";
 
-// import "@openzeppelin/contracts/interfaces/IERC5484.sol";
+contract CSToken is ERC5192, IERC5484 {
+    mapping(uint256 => BurnAuth) private _burnAuthById;
+    address private _issuer;
+    mapping(uint256 => address) private _ownersById;
+
+    error ErrOnlyIssuer();
+    modifier onlyIssuer() {
+        if (msg.sender != _issuer) revert ErrOnlyIssuer();
+        _;
+    }
+
+    constructor() ERC5192("CSToken", "CST", true) {
+        _issuer = msg.sender;
+    }
+
+    function burnAuth(uint256 tokenId) external view returns (BurnAuth) {
+        return _burnAuthById[tokenId];
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override returns (bool) {
+        return
+            interfaceId == type(IERC5484).interfaceId ||
+            super.supportsInterface(interfaceId);
+    }
+
+    function safeMint(
+        address to,
+        uint256 tokenId,
+        BurnAuth burnAuth
+    ) public onlyIssuer {
+        super._mint(to, tokenId);
+        _ownersById[tokenId] = to;
+        _burnAuthById[tokenId] = burnAuth;
+        emit Issued(msg.sender, to, tokenId, burnAuth);
+    }
+
+    function burn(uint256 tokenId) public {
+        if (_burnAuthById[tokenId] == BurnAuth.IssuerOnly) {
+            require(msg.sender == _issuer, "Only issuer");
+            super._burn(tokenId);
+        } else if (_burnAuthById[tokenId] == BurnAuth.OwnerOnly) {
+            require(msg.sender == _ownersById[tokenId], "Only owner");
+            super._burn(tokenId);
+        } else if (_burnAuthById[tokenId] == BurnAuth.Both) {
+            require(
+                msg.sender == _issuer || msg.sender == _ownersById[tokenId],
+                "Only issuer or owner"
+            );
+            super._burn(tokenId);
+        } else if (_burnAuthById[tokenId] == BurnAuth.Neither) {
+            require(
+                msg.sender != _issuer && msg.sender != _ownersById[tokenId],
+                "Neither"
+            );
+            super._burn(tokenId);
+        }
+    }
+}
